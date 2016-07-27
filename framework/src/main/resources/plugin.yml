@@ -1,4 +1,4 @@
-main: me.markeh.factionsframework.FactionsFramework
+main: me.markeh.factionsframework.FactionsFrameworkPlugin
 name: FactionsFramework
 version: @version@
 website: http://ma.rkhugh.es/factionsframework

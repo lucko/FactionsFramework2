@@ -1,86 +1,64 @@
 package me.markeh.factionsframework;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
+import me.markeh.factionsframework.enums.FactionsVersion;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.plugin.java.JavaPlugin;
-
-import me.markeh.factionsframework.enums.FactionsVersion;
 
 public class LogUtil {
-	
-	// -------------------------------------------------- //
-	// CONSTRUCT
-	// -------------------------------------------------- //
-	
-	public LogUtil(JavaPlugin plugin, ChatColor colour) {
-		this.plugin = plugin;
-		this.colour = colour;
-		this.console = plugin.getServer().getConsoleSender();
-		
-		this.logsFolder = Paths.get(this.plugin.getDataFolder().getAbsolutePath(), "logs");
-	}
+
+	private LogUtil() {}
 	
 	// -------------------------------------------------- //
 	// FIELDS
 	// -------------------------------------------------- //
-	
-	private JavaPlugin plugin;
-	private ChatColor colour;
-	private ConsoleCommandSender console;
-	private Path logsFolder;
+
+	private static final ChatColor COLOR = ChatColor.AQUA;
+	private static final ConsoleCommandSender CONSOLE = Bukkit.getConsoleSender();
+	private static final String PLUGIN_NAME = "FactionsFramework";
 	
 	// -------------------------------------------------- //
 	// METHODS
 	// -------------------------------------------------- //
 	
-	public String getPluginName() {
-		return this.plugin.getDescription().getName();
+	public static String getPluginName() {
+		return PLUGIN_NAME;
 	}
 	
-	public ChatColor getColour() {
-		return this.colour;
+	public static ChatColor getColour() {
+		return COLOR;
 	}
 	
-	public ConsoleCommandSender getConsole() {
-		return this.console;
+	public static ConsoleCommandSender getConsole() {
+		return CONSOLE;
 	}
 	
-	public Path getLogsFolder() {
-		return this.logsFolder;
+	public static void log(String msg) {
+		CONSOLE.sendMessage(COLOR + "[" + PLUGIN_NAME + "] " + ChatColor.WHITE + msg);
 	}
 	
-	public void log(String msg) {
-		this.getConsole().sendMessage(this.colour + "[" + this.getPluginName() + "] " + ChatColor.WHITE + msg );
-	}
-	
-	public void err(Exception e) {
-					
-		this.getConsole().sendMessage(
-				ChatColor.RED + "[" + this.getPluginName() + "] " + 
+	public static void err(Exception e) {
+		CONSOLE.sendMessage(
+				ChatColor.RED + "[" + PLUGIN_NAME + "] " +
 				ChatColor.MAGIC + "!!" + ChatColor.RESET + ChatColor.RED + "ERROR" + ChatColor.MAGIC + "!!" + ChatColor.RESET + 
 				ChatColor.GOLD + " An internal error occured! " + e.toString());
 		
 		e.printStackTrace();
 		
 		Throwable cause = null;
-		
 		cause = e.getCause();
 		
 		while (cause != null) {
-			this.getConsole().sendMessage(ChatColor.GOLD + "caused by " + cause.getMessage());
+			CONSOLE.sendMessage(ChatColor.GOLD + "caused by " + cause.getMessage());
 			cause.printStackTrace();
-			
 			cause = cause.getCause();
 		}
 		
-		String factionsversion = FactionsVersion.get().name();
-		String frameworkversion = FactionsFramework.get().getDescription().getVersion();
-		String serverversion = FactionsFramework.get().getServer().getVersion();
+		String factionsVersion = FactionsVersion.get().name();
+		String frameworkVersion = FactionsFramework.VERSION;
+		String serverVersion = Bukkit.getVersion();
 		
-		this.getConsole().sendMessage(ChatColor.GOLD + "version_info: factionsversion=" + factionsversion + ",frameworkversion=" + frameworkversion + ",serverversion=" + serverversion + "//");
+		CONSOLE.sendMessage(ChatColor.GOLD + "version_info: factionsversion=" + factionsVersion + ",frameworkversion=" + frameworkVersion + ",serverversion=" + serverVersion + "//");
 	}
 	
 }

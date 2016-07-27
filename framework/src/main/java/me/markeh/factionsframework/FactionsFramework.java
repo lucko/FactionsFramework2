@@ -21,15 +21,6 @@
 
 package me.markeh.factionsframework;
 
-import java.io.IOException;
-
-import org.bukkit.ChatColor;
-import org.bukkit.event.HandlerList;
-import org.bukkit.plugin.java.JavaPlugin;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import me.markeh.factionsframework.command.FactionsCommandManager;
 import me.markeh.factionsframework.deprecation.Deprecation;
 import me.markeh.factionsframework.entities.FPlayers;
@@ -38,86 +29,83 @@ import me.markeh.factionsframework.enums.FactionsVersion;
 import me.markeh.factionsframework.layer.ConfLayer;
 import me.markeh.factionsframework.layer.EventsLayer;
 import me.markeh.factionsframework.layer.LoadBase;
+import org.bukkit.Bukkit;
+import org.bukkit.event.HandlerList;
+import org.bukkit.plugin.Plugin;
 
 /**
  * Factions Framework has a 6 month deprecation policy.
  * See me.markeh.factionsframework.deprecation.Deprecation for information.
  */
-public class FactionsFramework extends JavaPlugin {
-	
+public class FactionsFramework {
 	// -------------------------------------------------- //
-	// SINGLETON  
+	// SINGLETON
 	// -------------------------------------------------- //
-	
-	private static FactionsFramework i;
-	public static FactionsFramework get() { return i; }
-	public FactionsFramework() { i = this; }
-	
-	// -------------------------------------------------- //
-	// FIELDS  
-	// -------------------------------------------------- //
-	
-	private Gson gson = new GsonBuilder().setPrettyPrinting().create();
-	private LogUtil logUtil = new LogUtil(this, ChatColor.AQUA);
-	
-	// -------------------------------------------------- //
-	// ENABLE  
-	// -------------------------------------------------- //
-	
-	@Override
-	public final void onEnable() {
-		// Load our config by running get()
-		FrameworkConfig.get();
-		
-		// Initialise ConfLayer early 
-		ConfLayer.get();
-		
-		// Enable events
-		this.getServer().getPluginManager().registerEvents(EventsLayer.get(), this);
-		
-		try {
-			new Metrics(this).enable();
-		} catch (IOException e) {
-			this.err(e);
+
+	public static final String VERSION = "1.2.0";
+	private static FactionsFramework instance;
+
+	public static FactionsFramework get() {
+		return instance;
+	}
+
+	public static boolean isLoaded() {
+		return instance != null;
+	}
+
+	public static void load(Plugin plugin) {
+		if (isLoaded()) {
+			throw new IllegalStateException("Already loaded");
 		}
-		
-		log("Factions API version is: " + FactionsVersion.get().toString());
-		
+
+		instance = new FactionsFramework(plugin);
+	}
+
+	// -------------------------------------------------- //
+	// INSTANCE
+	// -------------------------------------------------- //
+
+	private final Plugin loadedBy;
+
+	private FactionsFramework(Plugin plugin) {
+		this.loadedBy = plugin;
+
+		// Initialise ConfLayer early
+		ConfLayer.get();
+
+		// Enable events
+		Bukkit.getPluginManager().registerEvents(EventsLayer.get(), plugin);
+
+		LogUtil.log("Factions API version is: " + FactionsVersion.get().toString());
+
 		if (LoadBase.get() != null) {
 			LoadBase.get().enabled();
 		}
 	}
-	
-	// -------------------------------------------------- //
-	// DISABLE  
-	// -------------------------------------------------- //
-	
-	@Override
-	public final void onDisable() {
-		// Unregister our events layer 
+
+	public void stop() {
+		instance = null;
+
+		// Unregister our events layer
 		HandlerList.unregisterAll(EventsLayer.get());
-		
+
 		FactionsCommandManager.get().removeAll();
-		
+
 		if (LoadBase.get() != null) {
 			LoadBase.get().disabled();
 		}
 	}
 	
-	// -------------------------------------------------- //
-	// METHODS  
-	// -------------------------------------------------- //
-	
 	public final void err(Exception e) {
-		this.logUtil.err(e);
+		LogUtil.err(e);
 	}
 	
 	public final void log(String...msgs) {
-		for (String msg : msgs) this.logUtil.log(msg);
+		for (String msg : msgs) LogUtil.log(msg);
 	}
-	
-	public final Gson getGson() {
-		return this.gson;
+
+	public final Plugin getLoadedBy() {
+		return this.loadedBy;
 	}
 	
 	/**
@@ -152,7 +140,7 @@ public class FactionsFramework extends JavaPlugin {
 	 */
 	@Deprecated
 	public final void logError(Exception e) {
-		this.logUtil.err(e);
+		LogUtil.err(e);
 	}
 	
 }

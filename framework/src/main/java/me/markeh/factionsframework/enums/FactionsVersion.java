@@ -1,8 +1,7 @@
 package me.markeh.factionsframework.enums;
 
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
-
-import me.markeh.factionsframework.FactionsFramework;
 
 public enum FactionsVersion {
 	
@@ -26,7 +25,7 @@ public enum FactionsVersion {
 	
 	private static FactionsVersion determine() {
 		// Fetch the Factions plugin and ensure it exists 
-		Plugin factionsPlugin = FactionsFramework.get().getServer().getPluginManager().getPlugin("Factions");
+		Plugin factionsPlugin = Bukkit.getPluginManager().getPlugin("Factions");
 		
 		String factionsVersion = factionsPlugin.getDescription().getVersion();
 		
@@ -44,7 +43,7 @@ public enum FactionsVersion {
 			try {
 				Class.forName("com.massivecraft.massivecore.command.type.enumeration.TypeDamageModifier");
 				return Factions_2_8_16;
-			} catch (Exception e) { }
+			} catch (Exception ignored) {}
 			
 			// must be an older version .. 
 			
@@ -52,7 +51,7 @@ public enum FactionsVersion {
 				// Factions Versions <= 2.6 use the universe system (or is unsupported) 
 				Class.forName("com.massivecraft.factions.entity.UPlayer");
 				return Factions_2_6;
-			} catch (Exception e) { }
+			} catch (Exception ignored) {}
 			
 			try {
 				// Factions Versions <= 2.8.6 has Spigot integration in an older spot 
@@ -69,17 +68,17 @@ public enum FactionsVersion {
 						return Factions_2_7;
 					}
 					
-				} catch (Exception e) { }
-				
+				} catch (Exception ignored) {}
+
 				return Factions_2_8_6;
-			} catch (Exception e) { }
+			} catch (Exception ignored) {}
 			
 			try {
 				Class.forName("com.massivecraft.massivecore.command.MassiveCommandHelp");
 			} catch (Exception e) {
-				return Factions_2_8_7;					
-
+				return Factions_2_8_7;
 			}
+
 			// We assume it's a more recent version of Factions 
 			return Factions_2_8_8;					
 		}
