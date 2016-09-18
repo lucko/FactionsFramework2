@@ -1,50 +1,33 @@
 package me.markeh.factionsframework.layer.layer_1_6;
 
-import java.util.Collection;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-
 import com.massivecraft.factions.Board;
 import com.massivecraft.factions.iface.RelationParticipator;
 import com.massivecraft.factions.struct.Relation;
 import com.massivecraft.factions.struct.Role;
+import me.lucko.factionsframework.api.FactionsFrameworkApi;
+import me.lucko.factionsframework.api.entities.FPlayer;
+import me.lucko.factionsframework.api.entities.Faction;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
 
-import me.markeh.factionsframework.Util;
-import me.markeh.factionsframework.entities.FPlayer;
-import me.markeh.factionsframework.entities.Faction;
-import me.markeh.factionsframework.entities.Factions;
-import me.markeh.factionsframework.entities.Messenger;
-import me.markeh.factionsframework.enums.Rel;
+import java.util.Collection;
 
-public class FPlayer_1_6 extends Messenger implements FPlayer {
-	
-	// -------------------------------------------------- //
-	// CONSTRUCT
-	// -------------------------------------------------- //
-	
-	public FPlayer_1_6(String id) {
-		this.id = id;
-		
-		if (id == "@console") {
-			this.factionsfplayer = null;
-		} else {
-			this.factionsfplayer = com.massivecraft.factions.FPlayers.getInstance().getById(id);
-		}
-	}
-	
-	// -------------------------------------------------- //
-	// FIELDS
-	// -------------------------------------------------- //
-	
+public class FPlayer_1_6 implements FPlayer {
+	private final FactionsFrameworkApi api;
+	private final boolean console;
 	private String id;
-	private com.massivecraft.factions.FPlayer factionsfplayer;
+	private com.massivecraft.factions.FPlayer player;
 	
-	// -------------------------------------------------- //
-	// METHODS
-	// -------------------------------------------------- //
+	public FPlayer_1_6(String id, FactionsFrameworkApi api) {
+		this.api = api;
+		this.id = id;
+		this.console = id.equals("@console");
+
+		this.player = console ? null : com.massivecraft.factions.FPlayers.getInstance().getById(id);
+	}
 	
 	@Override
 	public String getId() {
@@ -53,26 +36,23 @@ public class FPlayer_1_6 extends Messenger implements FPlayer {
 	
 	@Override
 	public Player asBukkitPlayer() {
-		return this.factionsfplayer.getPlayer();
+		return this.player.getPlayer();
 	}
 	
 	@Override
 	public Faction getFaction() {
-		if (this.id == "@console") return Factions.getNone(this.factionsfplayer.getPlayer().getWorld());
-		
-		return Factions.getById(this.factionsfplayer.getFaction().getId());
+		return console ? api.getNone(this.player.getPlayer().getWorld()) : api.getFaction(this.player.getFaction().getId());
 	}
 
 	@Override
 	public void setFaction(Faction faction) {
-		if (this.id == "@console") return;
-		
-		this.factionsfplayer.setFaction(com.massivecraft.factions.Factions.getInstance().getFactionById(faction.getId()));		
+		if (console) return;
+		this.player.setFaction(com.massivecraft.factions.Factions.getInstance().getFactionById(faction.getId()));
 	}
 
 	@Override
-	public Rel getRelationTo(Object object) {
-		if (this.id == "@console") return Rel.NEUTRAL;
+	public me.lucko.factionsframework.api.Relation getRelationTo(Object object) {
+		if (console) return me.lucko.factionsframework.api.Relation.NEUTRAL;
 		
 		if (object instanceof Faction) {
 			object = com.massivecraft.factions.Factions.getInstance().getFactionById(((Faction) object).getId());
@@ -86,8 +66,7 @@ public class FPlayer_1_6 extends Messenger implements FPlayer {
 			object = com.massivecraft.factions.FPlayers.getInstance().getByPlayer(((Player) object));
 		}
 		
-		Relation relation = this.factionsfplayer.getRelationTo((RelationParticipator) object);
-		
+		Relation relation = this.player.getRelationTo((RelationParticipator) object);
 		return Factions_1_6.convertRelationship(relation);
 	}
 
@@ -98,74 +77,74 @@ public class FPlayer_1_6 extends Messenger implements FPlayer {
 
 	@Override
 	public void msg(String msg) {
-		if (this.id == "@console") {
-			Bukkit.getConsoleSender().sendMessage(Util.colourse(msg));
+		if (console) {
+			Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', msg));
 			return;
 		}
 		
-		this.factionsfplayer.sendMessage(Util.colourse(msg));		
+		this.player.sendMessage(ChatColor.translateAlternateColorCodes('&', msg));
 	}
 
 	@Override
 	public Boolean isOnline() {
-		if (this.id == "@console") return true;
-		
-		return this.factionsfplayer.isOnline();
+		return console || this.player.isOnline();
 	}
 
 	@Override
-	public Rel getRole() {
-		Role role = this.factionsfplayer.getRole();
-		
-		if (role == Role.ADMIN) return Rel.LEADER;
-		if (role == Role.MODERATOR) return Rel.OFFICER;
-		
-		return Rel.MEMBER;
+	public me.lucko.factionsframework.api.Relation getRole() {
+		switch (this.player.getRole()) {
+			case ADMIN:
+				return me.lucko.factionsframework.api.Relation.LEADER;
+			case MODERATOR:
+				return me.lucko.factionsframework.api.Relation.OFFICER;
+			default:
+				return me.lucko.factionsframework.api.Relation.MEMBER;
+		}
 	}
 
 	@Override
-	public void setRole(Rel role) {
-		if (role == Rel.LEADER) {
-			this.factionsfplayer.setRole(Role.ADMIN);
+	public void setRole(me.lucko.factionsframework.api.Relation role) {
+		if (role == me.lucko.factionsframework.api.Relation.LEADER) {
+			this.player.setRole(Role.ADMIN);
 			return;
 		}
 		
-		if (role == Rel.OFFICER) {
-			this.factionsfplayer.setRole(Role.MODERATOR);
+		if (role == me.lucko.factionsframework.api.Relation.OFFICER) {
+			this.player.setRole(Role.MODERATOR);
 			return;
 		}
 		
-		this.factionsfplayer.setRole(Role.NORMAL);		
+		this.player.setRole(Role.NORMAL);
 	}
 
 	@Override
 	public Location getLocation() {
-		return this.factionsfplayer.getPlayer().getLocation();
+		return this.player.getPlayer().getLocation();
 	}
 	
 	@Override
 	public Faction getFactionAt() {
-		return Factions.getById(Board.getInstance().getFactionAt(this.factionsfplayer.getLastStoodAt()).getId());
+		return api.getFaction(Board.getInstance().getFactionAt(this.player.getLastStoodAt()).getId());
 	}
 	
 	@Override
 	public World getWorld() {
-		return this.factionsfplayer.getPlayer().getWorld();
+		return this.player.getPlayer().getWorld();
 	}
 
 	@Override
 	public String getName() {
-		return this.factionsfplayer.getName();
+		return this.player.getName();
 	}
 
 	@Override
 	public double getPowerBoost() {
-		return this.factionsfplayer.getPowerBoost();
+		return this.player.getPowerBoost();
 	}
 
 	@Override
 	public void setPowerBoost(Double boost) {
-		this.factionsfplayer.setPowerBoost(boost);
+		this.player.setPowerBoost(boost);
 	}
 
 	@Override
@@ -175,7 +154,7 @@ public class FPlayer_1_6 extends Messenger implements FPlayer {
 
 	@Override
 	public double getPower() {
-		return this.factionsfplayer.getPower();
+		return this.player.getPower();
 	}
 
 	@Override
@@ -185,7 +164,7 @@ public class FPlayer_1_6 extends Messenger implements FPlayer {
 
 	@Override
 	public boolean tryClaim(Faction faction, Location location) {
-		return this.factionsfplayer.attemptClaim(com.massivecraft.factions.Factions.getInstance().getFactionById(faction.getId()), location, true);
+		return this.player.attemptClaim(com.massivecraft.factions.Factions.getInstance().getFactionById(faction.getId()), location, true);
 	}
 
 	@Override

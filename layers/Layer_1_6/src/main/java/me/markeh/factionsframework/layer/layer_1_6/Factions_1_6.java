@@ -11,9 +11,6 @@ import com.massivecraft.factions.Board;
 import com.massivecraft.factions.FLocation;
 import com.massivecraft.factions.struct.Relation;
 
-import me.markeh.factionsframework.entities.Faction;
-import me.markeh.factionsframework.entities.Factions;
-import me.markeh.factionsframework.enums.Rel;
 
 public class Factions_1_6 extends Factions {
 	

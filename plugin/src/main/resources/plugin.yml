@@ -1,0 +1,7 @@
+main: me.markeh.factionsframework.plugin.FactionsFrameworkPlugin
+name: FactionsFramework
+version: {$project.version}
+website: https://github.com/lucko/FactionsFramework
+authors: [MarkehMe, Luck]
+description: An abstraction library for integration with multiple versions of Factions.
+softdepend: [Factions]
