@@ -5,12 +5,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>me.lucko.factionsframework</groupId>
+    <groupId>me.markeh.factionsframework</groupId>
     <artifactId>factionsframework</artifactId>
-    <version>2.0.0-SNAPSHOT</version>
+    <version>1.2.0</version>
     <modules>
-        <module>api</module>
-        <module>plugin</module>
+        <module>project</module>
+        <module>framework</module>
         <module>layers/Layer_1_6</module>
         <module>layers/Layer_1_8</module>
         <module>layers/Layer_2_6</module>
@@ -21,32 +21,10 @@
         <module>layers/Layer_2_8_15X</module>
     </modules>
 
-    <name>FactionsFramework</name>
-    <description>An abstraction library for integration with multiple versions of Factions.</description>
-    <url>https://github.com/lucko/FactionsFramework</url>
-
-    <scm>
-        <connection>scm:git:https://github.com/lucko/FactionsFramework.git</connection>
-        <developerConnection>scm:git:git@github.com:lucko/FactionsFramework.git</developerConnection>
-        <url>https://github.com/lucko/FactionsFramework</url>
-    </scm>
-
     <packaging>pom</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <release.version>2.0</release.version>
     </properties>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>luck-snapshots</id>
-            <url>https://nexus.lucko.me/repository/maven-snapshots/</url>
-        </snapshotRepository>
-        <repository>
-            <id>luck-releases</id>
-            <url>https://nexus.lucko.me/repository/maven-releases/</url>
-        </repository>
-    </distributionManagement>
 
     <repositories>
         <repository>
@@ -56,13 +34,6 @@
     </repositories>
 
     <dependencies>
-        <!-- Lombok -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.16.10</version>
-            <scope>provided</scope>
-        </dependency>
         <!-- BukkitAPI -->
         <dependency>
             <groupId>org.bukkit</groupId>

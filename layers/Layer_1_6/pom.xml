@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>factionsframework</artifactId>
-        <groupId>me.lucko.factionsframework</groupId>
-        <version>2.0.0-SNAPSHOT</version>
+        <groupId>me.markeh.factionsframework</groupId>
+        <version>1.2.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>me.markeh.factionsframework</groupId>
     <artifactId>factionsframework-layer_1_6</artifactId>
+    <version>1.2.0</version>
     <build>
         <plugins>
             <plugin>
@@ -57,16 +57,13 @@
             <version>1.6.9.5-U0.1.18</version>
             <scope>provided</scope>
         </dependency>
-
-        <!-- API -->
+        <!-- Framework -->
         <dependency>
-            <groupId>me.lucko.factionsframework</groupId>
-            <artifactId>factionsframework-api</artifactId>
-            <version>${project.version}</version>
+            <groupId>me.markeh.factionsframework</groupId>
+            <artifactId>factionsframework-framework</artifactId>
+            <version>1.2.0</version>
             <scope>provided</scope>
         </dependency>
-
-
     </dependencies>
 
 </project>
